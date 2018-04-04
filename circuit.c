@@ -479,7 +479,7 @@ void processAllPossibleCircuits(Gate gate, Wire wire, Name name, int totalNum) {
             startingPoint = 0;
         } else {
             for (int i = 0; i < totalNumOfOnes; i++) {
-                //
+                //TODO fuck me
             }
         }
         totalNumOfOnes += 1; //Increase the value of the totalNumOfOnes.
