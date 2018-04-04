@@ -476,12 +476,12 @@ void processAllPossibleCircuits(Gate gate, Wire wire, Name name, int totalNum) {
 
         } else if (totalNumOfOnes == 1) {
             while (startingPoint < totalNumOfNodes) {
-                *(targetWires[startingPoint]->val) = 1; //return the value of the first target wire as 1.
+                *(targetWires[startingPoint]->val) = 1; //change the value of the first target wire as 1.
 
                 printInputValues(wire, name->next);
                 printTheResult(gate, wire, totalNum);
 
-                changeAllWireValuesToZero(wire->next->next); //change all wire values to zero.
+                *(targetWires[startingPoint]->val) = 0;
 
                 startingPoint += 1;
             }
@@ -494,6 +494,15 @@ void processAllPossibleCircuits(Gate gate, Wire wire, Name name, int totalNum) {
                 printTheResult(gate, wire, totalNum);
 
                 return; //terminate the function.
+            } else if ((totalNumOfNodes - 1) == totalNumOfOnes) {
+                for (int j = (totalNumOfNodes - 1); j >= 0; j--) {
+                    *(targetWires[startingPoint]->val) = 0; //change the value of the target wire as 0.
+
+                    printInputValues(wire, name->next);
+                    printTheResult(gate, wire, totalNum);
+
+                    *(targetWires[startingPoint]->val) = 1; //return the value of the target wire as 1.
+                }
             }
             for (int i = 0; i < totalNumOfOnes; i++) {
                 //TODO fuck me
