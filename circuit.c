@@ -172,11 +172,23 @@ void findWire(Wire wire, char *name, char *counter, char *checker) {
 
 }
 
+//Get the value of the particular wire.
 char getTheValueOfWireByName(Wire wire, char *name) {
-    if (strcmp(wire->name, name) == 0) {
+    if (strcmp(wire->name, name) == 0) { //checks the name of the wire by comparing the name of the wire with the given string
+        //return the corresponding wire's value.
         return *(wire->val);
     } else {
         return getTheValueOfWireByName(wire->next, name);
+    }
+}
+
+//Get the corresponding wire.
+Wire getTheWireByName(Wire wire, char *name) {
+    if (strcmp(wire->name, name) == 0) { //checks the name of the wire by comparing the name of the wire with the given string
+        //return the corresponding wire.
+        return wire;
+    } else {
+        return getTheWireByName(wire->next, name); //Call itself recursively to check the next wire.
     }
 }
 
@@ -281,11 +293,7 @@ void getInputWire(Wire wire, const char *index, char *val) { //Get the wires, ta
         wire = wire->next;
         countWires += 1;
     }
-
-    if (*index == countWires) { //Check if the current index is equal to the target index.
-        *val = *(wire->val); //set the val as a value of the current wire.
-    }
-
+    *val = *(wire->val); //set the val as a value of the current wire.
 }
 
 //Change the value of the output wire.
@@ -313,28 +321,31 @@ void processCircuit(Gate gate, Wire wires) {
 
     switch (*(gate->gateNum)) {
         case 0 : break; //0 is the error number, thus, get out the switch statement.
-        case 1 : operateAnd(&in1, &in2, &out);
+        case 1 : operateAnd(in1, in2, &out); //operate the AND gate.
             break;
-        case 2 : operateEq(&in1, &in2, &out);
+        case 2 : operateEq(in1, in2, &out); //operate the EQ gate.
             break;
         case 3 : break; //Do nothing if the gate is IN.
-        case 4 : operateNand(&in1, &in2, &out);
+        case 4 : operateNand(in1, in2, &out); //operate the NAND gate.
             break;
-        case 5 : operateNor(&in1, &in2, &out);
+        case 5 : operateNor(in1, in2, &out); //operate the NOR gate.
             break;
-        case 6 : operateNot(&in1, &out);
+        case 6 : operateNot(in1, &out); //operate the NOT gate.
             break;
-        case 7 : operateOr(&in1, &in2, &out);
+        case 7 : operateOr(in1, in2, &out); //operate the OR gate.
             break;
-        case 8 : operateXor(&in1, &in2, &out);
+        case 8 : operateXor(in1, in2, &out); //operate the XOR gate.
             break;
         default : puts("Error: Undefined behaviour!"); //As there are 8 gates, the program will print out the warning message for other numbers.
     }
 
     if (*(gate->isLast) == 0) {
-      processCircuit(gate->next, wires); //Call itself recursively to process all gates.
+        processCircuit(gate->next, wires); //Call itself recursively to process all gates.
     }
 
+    if (*(gate->gateNum) == 3) { //check if the gate is IN.
+        return; //if so, do not change anything, and terminate the function.
+    }
     changeTheOutputWire(wires, gate->out, &out); //Set the value of the output wire.
 }
 
@@ -396,6 +407,15 @@ char iterateProcess(Gate gate, Wire wire, int totalNum) {
     return stabilised;
 }
 
+//This function change all wire values to zero.
+void changeAllWireValuesToZero(Wire wire) {
+    while (*(wire->isLast) == 0) { //check if the current node is the last node.
+        *(wire->val) = 0;
+        wire = wire->next;
+    }
+    *(wire->val) = 0;
+}
+
 //Print the value of the all output wires of the IN gates.
 void printInputValues(Wire wire, Name name) {
 
@@ -423,17 +443,46 @@ void printTheResult(Gate gate, Wire wire, int totalNum) {
 void processAllPossibleCircuits(Gate gate, Wire wire, Name name, int totalNum) {
     char totalNumOfNodes = countNumOfName(name->next); //count the number of nodes.
     char totalNumOfOnes = 0; //the aim of this variable is to check the total number of 1s for the truth table.
-    //char startingPoint = 0; //TODO explain this variable.
+    int startingPoint = 0; //TODO explain this variable.
 
     //As we could run the circuit with 0 and 1 for the initial value of the wire, iterate the loop 2^(total number of nodes) times.
     int numToIterate = (int) pow(2, (double)totalNumOfNodes);
+
+    Wire targetWires[totalNumOfNodes];
+    for (int i = 0; i < totalNumOfNodes; i++) {
+        Name targetName = name->next;
+        int index = totalNumOfNodes - 1;
+        index -= i;
+
+        for (int j = 0; j < index; j++) targetName = targetName->next;
+
+        targetWires[i] = getTheWireByName(wire, targetName->val);
+    }
 
     for (int i = 0; i < numToIterate; i++) {
         if (totalNumOfOnes == 0) { //check if the total number of 1 is 0.
             printInputValues(wire, name->next);
             printTheResult(gate, wire, totalNum); //print the result of the circuit.
-            continue; //keep iterate the loop.
+            changeAllWireValuesToZero(wire->next->next); //change all wire values to zero.
+
+        } else if (totalNumOfOnes == 1) {
+            while (startingPoint < totalNumOfNodes) {
+                *(targetWires[startingPoint]->val) = 1; //return the value of the first target wire as 1.
+
+                printInputValues(wire, name->next);
+                printTheResult(gate, wire, totalNum);
+
+                changeAllWireValuesToZero(wire->next->next); //change all wire values to zero.
+
+                startingPoint += 1;
+            }
+            startingPoint = 0;
+        } else {
+            for (int i = 0; i < totalNumOfOnes; i++) {
+                //
+            }
         }
+        totalNumOfOnes += 1; //Increase the value of the totalNumOfOnes.
     }
 }
 

@@ -18,7 +18,6 @@ struct node {
 };
 
 typedef struct node *Name;
-typedef struct node *History;
 
 //The prototype of the checkIfNand function, to check the name of the gate in the circuit.c file.
 char checkIfNand(char *);
@@ -31,12 +30,12 @@ typedef struct wire {
 } *Wire;
 
 //Prototypes of the functions that will process the circuit.
-void operateNot(char *, char *);
-void operateEq(char *, char *, char *);
-void operateAnd(char *, char *, char *);
-void operateOr(char *, char *, char *);
-void operateNor(char *, char *, char *);
-void operateNand(char *, char *, char *);
-void operateXor(char *, char *, char *);
+void operateNot(char , char *);
+void operateEq(char , char , char *);
+void operateAnd(char , char , char *);
+void operateOr(char , char , char *);
+void operateNor(char , char , char *);
+void operateNand(char , char , char *);
+void operateXor(char , char , char *);
 
 #endif //PRACTICAL4_SUBSETS_H

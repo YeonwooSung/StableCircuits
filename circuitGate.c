@@ -122,17 +122,17 @@ char checkIfNand(char *gateName) {
 }
 
 //This is a function to process the gate NOT.
-void operateNot(char *in, char *out) {
-    if (*in == 0) { //check if *in is 0
+void operateNot(char in, char *out) {
+    if (in == 0) { //check if *in is 0
         *out = 1;
-    } else if (*in == 1) {
+    } else if (in == 1) {
         *out = 0;
     }
 }
 
 //This is a function to process the gate AND.
-void operateAnd(char *in1, char *in2, char *out) {
-    if (*in1 == 1 && *in2 == 1) { //check if (*in1) is 1 and if (*in2) is 1.
+void operateAnd(char in1, char in2, char *out) {
+    if (in1 == 1 && in2 == 1) { //check if (*in1) is 1 and if (*in2) is 1.
         *out = 1;
     } else {
         *out = 0;
@@ -140,8 +140,8 @@ void operateAnd(char *in1, char *in2, char *out) {
 }
 
 //This is a function to process the gate OR.
-void operateOr(char *in1, char *in2, char *out) {
-    if (*in1 == 1 || *in2 == 1) { //check if (*in1) is 1 or if (*in2) is 1.
+void operateOr(char in1, char in2, char *out) {
+    if (in1 == 1 || in2 == 1) { //check if (*in1) is 1 or if (*in2) is 1.
         *out = 1;
     } else {
         *out = 0;
@@ -149,17 +149,19 @@ void operateOr(char *in1, char *in2, char *out) {
 }
 
 //This is a function to process the gate NOR.
-void operateNor(char *in1, char *in2, char *out) {
-    if (*in1 == 0 && *in2 == 0) { //check if the (*in1) is 0, or (*in2) is 0.
-        *out = 1;
-    } else {
+void operateNor(char in1, char in2, char *out) {
+    operateOr(in1, in2, out);
+    if (*out == 1) {
         *out = 0;
+    } else {
+        *out = 1;
     }
 }
 
 //This is a function to process the gate NAND.
-void operateNand(char *in1, char *in2, char *out) {
-    if (*in1 ==1 && *in2 == 1) { //check if the (*in1) and (*in2) is both 0.
+void operateNand(char in1, char in2, char *out) {
+    operateAnd(in1, in2, out);
+    if (*out == 1) {
         *out = 0;
     } else {
         *out = 1;
@@ -167,8 +169,8 @@ void operateNand(char *in1, char *in2, char *out) {
 }
 
 //This is a function to process the gate EQ.
-void operateEq(char *in1, char *in2, char *out) {
-    if (*in1 == *in2) { //check if the (*in1) is equal to (*in2).
+void operateEq(char in1, char in2, char *out) {
+    if (in1 == in2) { //check if the (*in1) is equal to (*in2).
         *out = 1;
     } else {
         *out = 0;
@@ -176,8 +178,8 @@ void operateEq(char *in1, char *in2, char *out) {
 }
 
 //This is a function to process the gate XOR.
-void operateXor(char *in1, char *in2, char *out) {
-    if (*in1 != *in2) { //check if the (*in1) is not equal to (*in2).
+void operateXor(char in1, char in2, char *out) {
+    if (in1 != in2) { //check if the (*in1) is not equal to (*in2).
         *out = 1;
     } else {
         *out = 0;
