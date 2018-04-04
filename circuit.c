@@ -416,6 +416,15 @@ void changeAllWireValuesToZero(Wire wire) {
     *(wire->val) = 0;
 }
 
+//This function change all wire values to one.
+void changeAllWireValuesToOne(Wire wire) {
+    while (*(wire->isLast) == 0) { //check if the current node is the last node.
+        *(wire->val) = 1;
+        wire = wire->next;
+    }
+    *(wire->val) = 1;
+}
+
 //Print the value of the all output wires of the IN gates.
 void printInputValues(Wire wire, Name name) {
 
@@ -478,6 +487,14 @@ void processAllPossibleCircuits(Gate gate, Wire wire, Name name, int totalNum) {
             }
             startingPoint = 0;
         } else {
+            if (totalNumOfNodes == totalNumOfOnes) {
+                changeAllWireValuesToOne(wire->next->next); //change all wire values to one.
+
+                printInputValues(wire, name->next);
+                printTheResult(gate, wire, totalNum);
+
+                return; //terminate the function.
+            }
             for (int i = 0; i < totalNumOfOnes; i++) {
                 //TODO fuck me
             }
