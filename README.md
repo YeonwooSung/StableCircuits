@@ -1,0 +1,2 @@
+# StableCircuits
+A digital circuit with feedback is called stable if the value of each wire (which can be 0 or 1) remains unchanged over time. We say a circuit stabilises if eventually it becomes stable. Some circuits stabilise for certain input values but not for others. We will explore the simulation of digital circuits to determine for which inputs they stabilise. Moreover, output values are computed for all combinations of inputs. This amounts to a generalisation of the notion of truth table.
