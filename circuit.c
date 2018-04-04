@@ -297,7 +297,7 @@ void getInputWire(Wire wire, const char *index, char *val) { //Get the wires, ta
 }
 
 //Change the value of the output wire.
-void changeTheOutputWire(Wire wire, char *index, char *val) {
+void changeTheOutputWire(Wire wire, const char *index, const char *val) {
 
     char countWires = 0;
 
@@ -504,7 +504,7 @@ void processAllPossibleCircuits(Gate gate, Wire wire, Name name, int totalNum) {
                     *(targetWires[startingPoint]->val) = 1; //return the value of the target wire as 1.
                 }
             }
-            for (int i = 0; i < totalNumOfOnes; i++) {
+            for (int j = 0; j < totalNumOfOnes; j++) {
                 //TODO fuck me
             }
         }
