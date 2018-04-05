@@ -1,0 +1,66 @@
+s IN
+r IN
+t IN
+q AND s r
+u OR q foo
+foo NAND t u
+u OR q foo
+foo NAND t u
+k NOR s foo
+my NAND k t
+a XOR s t
+b EQ r t
+qbar OR my a
+nbar AND b my
+q2 NAND s r
+u2 NOR q2 foo2
+foo2 NOR t u2
+u2 NOR q2 foo2
+foo2 NOR t u2
+k2 NOR s foo2
+my2 AND k2 t
+a2 OR s t
+b2 EQ r t
+qbar2 NOR my2 a2
+nbar2 NAND b2 my2
+nqbar NOT qbar
+nnbar NOT nbar
+nqbar2 NOT qbar2
+nnbar2 NOT nbar2
+res1 NAND nqbar nqbar2
+res2 NAND nnbqr nnbqr2
+to NOT res1
+ro NOT res2
+q3 AND s r
+u3 OR q3 foo3
+foo3 NAND t u
+u3 OR q foo
+foo3 NAND t u3
+k3 NOR s foo3
+my3 NAND k3 t
+a3 XOR s t
+b3 EQ r t
+qbar3 OR my3 a3
+nbar3 AND b3 my3
+q3 NAND s r
+u3 NOR q3 foo3
+foo3 NOR t u3
+u3 NOR q3 foo3
+foo3 NOR t u3
+k3 NOR s foo2
+my3 AND k3 t
+a3 OR s t
+b3 EQ r t
+qbar3 NOR my3 a3
+nbar3 NAND b3 my3
+nqbar NOT qbar
+nnbar NOT nbar
+nqbar3 NOT qbar3
+nnbar3 NOT nbar3
+res3 NAND nqbar nqbar3
+res4 NAND nnbqr nnbqr3
+to2 NOT res3
+ro2 NOT res4
+rto AND to to2
+rro AND ro ro2
+out AND rto rro

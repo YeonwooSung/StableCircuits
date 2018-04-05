@@ -410,6 +410,25 @@ void storeValues(Values values, Wire wires) {
     *(values->val) = *(wires->val);
 }
 
+//Check if the "out" wire is used in the circuit.
+char checkIfOutWireIsUsed(Gate gate) {
+
+    while (*(gate->isLast) == 0) {
+
+        if (*(gate->out) == 2 || *(gate->in1) == 2 || *(gate->in2) == 2) {
+            return 1;
+        }
+
+        gate = gate->next;
+    }
+
+    if (*(gate->out) == 2 || *(gate->in1) == 2 || *(gate->in2) == 2) {
+        return 1;
+    }
+
+    return 0;
+}
+
 //Iterate the while loop to process the circuit to check if the circuit stabilised.
 char iterateProcess(Gate gate, Wire wire, int totalNum) {
 
@@ -535,7 +554,11 @@ void processAllPossibleCircuits(Gate gate, Wire wire, Name name, int totalNum) {
             } else if ((totalNumOfNodes - 1) == totalNumOfOnes) {
                 startingPoint = totalNumOfNodes - 1;
                 for (int j = (totalNumOfNodes - 1); j >= 0; j--) {
-                    changeAllWireValuesToOne(wire->next->next->next);
+                    if (checkIfOutWireIsUsed(gate) == 1) {
+                        changeAllWireValuesToOne(wire->next->next->next->next); //check if the "out" wire is used in the circuit.
+                    } else {
+                        changeAllWireValuesToOne(wire->next->next->next);
+                    }
                     *(targetWires[startingPoint]->val) = 0; //change the value of the target wire as 0.
 
                     printInputValues(wire, name->next); //print out the name of wires to print out the first row of the truth table.
