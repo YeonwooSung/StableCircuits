@@ -430,9 +430,8 @@ char checkIfOutWireIsUsed(Gate gate) {
 }
 
 //Iterate the while loop to process the circuit to check if the circuit stabilised.
-char iterateProcess(Gate gate, Wire wire, int totalNum) {
+char iterateProcess(Gate gate, Wire wire, long long totalNum) {
 
-    char stabiliseChecker = 3; //The aim of this variable is to check if the circuit stabilises.
     char stabilised = 0; //if the circuit stabilises, set this variable as 1.
 
     //Make the Values type variable, which will be used to check the stabilisation.
@@ -496,7 +495,7 @@ void printInputValues(Wire wire, Name name) {
 }
 
 //Print out the result of the circuit.
-void printTheResult(Gate gate, Wire wire, int totalNum) {
+void printTheResult(Gate gate, Wire wire, long long totalNum) {
     if (iterateProcess(gate, wire, totalNum) == 1) {
         printf("%d\n", *(wire->next->next->val)); //print out the stabilised value.
     } else {
@@ -505,7 +504,7 @@ void printTheResult(Gate gate, Wire wire, int totalNum) {
 }
 
 //TODO finish this function.
-void processAllPossibleCircuits(Gate gate, Wire wire, Name name, int totalNum) {
+void processAllPossibleCircuits(Gate gate, Wire wire, Name name, long long int totalNum) {
     char totalNumOfNodes = countNumOfName(name->next); //count the number of nodes.
     char totalNumOfOnes = 0; //the aim of this variable is to check the total number of 1s for the truth table.
     int startingPoint = 0; //to check the index of the target wire.
@@ -667,12 +666,12 @@ int main(int argc, char *argv[]) {
 
     free(buffer); //free the allocated memory.
 
-    int totalNum = countNumOfWire(wire);
+    long long totalNum = countNumOfWire(wire);
     /*
      * If there are 2^(number of wires) different states then the very last state might be the one it stablisise for.
      * Thus, I set the bound of the circuit loop as "2^(number of wires) + 1".
      */
-    totalNum = (int) pow((double)totalNum, 2) + 1;
+    totalNum = pow(2, (double)totalNum) + 1;
 
     if (*(inNames->isLast) == 0) {
         printNames(inNames->next); //print out the names of the output wires of the IN gates.
