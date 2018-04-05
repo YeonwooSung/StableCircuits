@@ -1,0 +1,31 @@
+s IN
+r IN
+t IN
+f IN
+temp NAND s r
+qbar NOT out
+ntemp NAND qbar f
+ttemp NOR r t
+otemp XOR s f
+nqbar AND otemp ntemp
+other EQ f s
+etemp OR other qbar
+pqbar OR ttemp nqbar
+out NOR qbar nqbar
+otemp AND out nqbar
+someting NAND etmep qbar
+myin1 OR s r
+myin2 AND t f
+myin3 NAND s f
+myin4 NOR r t
+myin5 XOR s t
+myin6 EQ r f
+myin7 NOT f
+qbar NAND myin1 myin2
+otemp NOR myin3 myin4
+pqbar NOT myin5
+etemp OR myin6 myin7
+lll AND qbar otemp
+myin3 AND etemp pqbar
+myin6 NAND myin3 lll
+out NOT myin6

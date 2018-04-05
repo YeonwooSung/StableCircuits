@@ -297,7 +297,7 @@ void getInputWire(Wire wire, const char *index, char *val) { //Get the wires, ta
 }
 
 //Change the value of the output wire.
-void changeTheOutputWire(Wire wire, const char *index, const char *val) {
+void changeTheOutputWire(Wire wire, char *index, char *val) {
 
     char countWires = 0;
 
@@ -389,6 +389,12 @@ char iterateProcess(Gate gate, Wire wire, int totalNum) {
     char stabiliseChecker = 3; //The aim of this variable is to check if the circuit stabilises.
     char stabilised = 0; //if the circuit stabilises, set this variable as 1.
 
+    //Make the Values type variable, which will be used to check the stabilisation.
+    Values values = (Values) malloc(sizeof(struct node));
+    values->val = (char *) malloc(1);
+    values->isLast = (char *) malloc(1);
+    *(values1->isLast) = 1;
+
     while (totalNum > 0) { //iterate the loop until the value of the totalNum is greater than 0.
         processCircuit(gate, wire); //process the circuit.
 
@@ -403,6 +409,8 @@ char iterateProcess(Gate gate, Wire wire, int totalNum) {
     if (*(wire->next->next->val) == stabiliseChecker) {
         stabilised = 1; //if so, set the value of the variable "stabilised" as 1.
     }
+
+    free(values);
 
     return stabilised;
 }
@@ -452,12 +460,12 @@ void printTheResult(Gate gate, Wire wire, int totalNum) {
 void processAllPossibleCircuits(Gate gate, Wire wire, Name name, int totalNum) {
     char totalNumOfNodes = countNumOfName(name->next); //count the number of nodes.
     char totalNumOfOnes = 0; //the aim of this variable is to check the total number of 1s for the truth table.
-    int startingPoint = 0; //TODO explain this variable.
+    int startingPoint = 0; //to check the index of the target wire.
 
     //As we could run the circuit with 0 and 1 for the initial value of the wire, iterate the loop 2^(total number of nodes) times.
     int numToIterate = (int) pow(2, (double)totalNumOfNodes);
 
-    Wire targetWires[totalNumOfNodes];
+    Wire targetWires[totalNumOfNodes]; //A Wire type array to store all wires in it.
     for (int i = 0; i < totalNumOfNodes; i++) {
         Name targetName = name->next;
         int index = totalNumOfNodes - 1;
@@ -470,6 +478,7 @@ void processAllPossibleCircuits(Gate gate, Wire wire, Name name, int totalNum) {
 
     for (int i = 0; i < numToIterate; i++) {
         if (totalNumOfOnes == 0) { //check if the total number of 1 is 0.
+
             printInputValues(wire, name->next);
             printTheResult(gate, wire, totalNum); //print the result of the circuit.
             changeAllWireValuesToZero(wire->next->next); //change all wire values to zero.
@@ -490,26 +499,58 @@ void processAllPossibleCircuits(Gate gate, Wire wire, Name name, int totalNum) {
             if (totalNumOfNodes == totalNumOfOnes) {
                 changeAllWireValuesToOne(wire->next->next); //change all wire values to one.
 
-                printInputValues(wire, name->next);
-                printTheResult(gate, wire, totalNum);
+                printInputValues(wire, name->next); //print out the name of wires to print out the first row of the truth table.
+                printTheResult(gate, wire, totalNum); //process the circuit and print out the rest rows of the truth table.
 
                 return; //terminate the function.
             } else if ((totalNumOfNodes - 1) == totalNumOfOnes) {
+                startingPoint = totalNumOfNodes - 1;
                 for (int j = (totalNumOfNodes - 1); j >= 0; j--) {
+                    changeAllWireValuesToOne(wire->next->next);
                     *(targetWires[startingPoint]->val) = 0; //change the value of the target wire as 0.
 
-                    printInputValues(wire, name->next);
-                    printTheResult(gate, wire, totalNum);
+                    printInputValues(wire, name->next); //print out the name of wires to print out the first row of the truth table.
+                    printTheResult(gate, wire, totalNum); //process the circuit and print out the rest rows of the truth table.
 
                     *(targetWires[startingPoint]->val) = 1; //return the value of the target wire as 1.
+                    startingPoint -= 1;
                 }
+                changeAllWireValuesToZero(wire->next->next); //reset all wires' value to 0.
+                startingPoint = 0; //reset the value of the startingPoint to 0.
             }
-            for (int j = 0; j < totalNumOfOnes; j++) {
-                //TODO fuck me
-            }
-        }
+
+            char endPoint = totalNumOfOnes - 1; //This will depict the index of the last 1.
+            char numOfMoved = 0; //To check the number of moved 1s.
+            char numOfRemain = totalNumOfOnes - 2; //to check if the program moved all 1s.
+
+            for (int j = 0; j < totalNumOfOnes; j++) { //iterate the loop for "totalNumOfOnes" times to print out all possible outputs.
+
+                if (j == 0) {
+
+                    int n = 0; //to check the number of iteration.
+                    while (n < (totalNumOfNodes - 1)) {
+                        *(targetWires[n]->val) = 1;
+                        n += 1;
+                    }//while loop ends
+
+                } else if (j == totalNumOfOnes - 1) {
+
+                    int ind = totalNumOfOnes - 1; //the index of the target wire, to check the number of iteration.
+                    while (ind > 0) {
+                        *(targetWires[ind]->val) = 1;
+                        ind -= 1;
+                    }//while loop ends
+                } else {
+                    //TODO
+                }
+
+                changeAllWireValuesToZero(wire->next->next); //reset all wire values to 0.
+                numOfMoved += 1;
+            } //for loop ends.
+
+        } //else statement ends
         totalNumOfOnes += 1; //Increase the value of the totalNumOfOnes.
-    }
+    } //for loop ends.
 }
 
 //The main function, which is the starting point of the circuit program.
@@ -586,10 +627,10 @@ int main(int argc, char *argv[]) {
     }
     printf("out \n"); //print out the name of the "out" wire.
 
+    //TODO If there is stabilisation, but no wire is called out, then 0 is output.
     if (*(inNames->isLast) == 1) { //check if there is any output wire of the IN gate.
         printTheResult(gate, wire, totalNum);
     } else { //Otherwise (if there is more than one name of the output wire of the IN gate).
-        //TODO process the circuit with case 0 and case 1.
         processAllPossibleCircuits(gate, wire, inNames, totalNum);
     }
 
