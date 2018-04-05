@@ -507,13 +507,13 @@ void printTheResult(Gate gate, Wire wire, long long totalNum) {
 void processAllPossibleCircuits(Gate gate, Wire wire, Name name, long long int totalNum) {
     char totalNumOfNodes = countNumOfName(name->next); //count the number of nodes.
     char totalNumOfOnes = 0; //the aim of this variable is to check the total number of 1s for the truth table.
-    int startingPoint = 0; //to check the index of the target wire.
+    long long startingPoint = 0; //to check the index of the target wire.
 
     //As we could run the circuit with 0 and 1 for the initial value of the wire, iterate the loop 2^(total number of nodes) times.
-    int numToIterate = (int) pow(2, (double)totalNumOfNodes);
+    long long numToIterate = pow(2, (double)totalNumOfNodes);
 
     Wire targetWires[totalNumOfNodes]; //A Wire type array to store all wires in it.
-    for (int i = 0; i < totalNumOfNodes; i++) {
+    for (long long i = 0; i < totalNumOfNodes; i++) {
         Name targetName = name->next;
         int index = totalNumOfNodes - 1;
         index -= i;
@@ -523,7 +523,7 @@ void processAllPossibleCircuits(Gate gate, Wire wire, Name name, long long int t
         targetWires[i] = getTheWireByName(wire, targetName->val);
     }
 
-    for (int i = 0; i < numToIterate; i++) {
+    for (long long i = 0; i < numToIterate; i++) {
         if (totalNumOfOnes == 0) { //check if the total number of 1 is 0.
 
             printInputValues(wire, name->next);
