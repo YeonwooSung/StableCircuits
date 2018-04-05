@@ -383,6 +383,33 @@ void printNames(Name name) {
     }
 }
 
+//Check if the circuit is stabilised.
+char isStabilised(Wire wire, Values values) {
+    //iterate the while loop until it gets the last wire.
+    while (*(wire->isLast) == 0) {
+        if (*(wire->val) != *(values->val)) { //check if it is not stabilised.
+            return 0;
+        }
+        wire = wire->next; //change the pointer to the next wire.
+        values = values->next; //change the pointer to the next value.
+    }
+    if (*(wire->val) != *(values->val)) { //check if it is not stabilised.
+        return 0;
+    }
+    return 1; //return 1 if the circuit is stabilised.
+}
+
+//make new nodes and store values in it.
+void storeValues(Values values, Wire wires) {
+    while (*(wires->isLast) == 0) {
+        values = makeNode(values);
+        *(values->val) = *(wires->val);
+        wires = wires->next;
+    }
+    values = makeNode(values);
+    *(values->val) = *(wires->val);
+}
+
 //Iterate the while loop to process the circuit to check if the circuit stabilised.
 char iterateProcess(Gate gate, Wire wire, int totalNum) {
 
@@ -393,26 +420,28 @@ char iterateProcess(Gate gate, Wire wire, int totalNum) {
     Values values = (Values) malloc(sizeof(struct node));
     values->val = (char *) malloc(1);
     values->isLast = (char *) malloc(1);
-    *(values1->isLast) = 1;
+    *(values->isLast) = 1;
 
     while (totalNum > 0) { //iterate the loop until the value of the totalNum is greater than 0.
         processCircuit(gate, wire); //process the circuit.
 
-        //TODO check all variables to check stabilisation.
         if (totalNum == 2) { //check if this is the second last turn.
-            stabiliseChecker = *(wire->next->next->val); //set the stabiliseChecker as a value of the "out" wire.
+
+            *(values->val) = *(wire->next->next->val); //set the stabiliseChecker as a value of the "out" wire.
+            if (*(wire->next->next->isLast) == 0) { //check if it's the last wire.
+                storeValues(values, wire->next->next->next);
+            }
+
         }
         totalNum -= 1;
     }
 
     //check if the previous turn's "out" wire's value is equal to the current value of the "out" wire.
-    if (*(wire->next->next->val) == stabiliseChecker) {
-        stabilised = 1; //if so, set the value of the variable "stabilised" as 1.
-    }
+    stabilised = isStabilised(wire->next->next, values);
 
-    free(values);
+    free(values); //free the allocated memory.
 
-    return stabilised;
+    return stabilised; //return 1 if the circuit is stabilised.
 }
 
 //This function change all wire values to zero.
