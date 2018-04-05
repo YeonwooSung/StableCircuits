@@ -535,7 +535,7 @@ void processAllPossibleCircuits(Gate gate, Wire wire, Name name, int totalNum) {
             } else if ((totalNumOfNodes - 1) == totalNumOfOnes) {
                 startingPoint = totalNumOfNodes - 1;
                 for (int j = (totalNumOfNodes - 1); j >= 0; j--) {
-                    changeAllWireValuesToOne(wire->next->next);
+                    changeAllWireValuesToOne(wire->next->next->next);
                     *(targetWires[startingPoint]->val) = 0; //change the value of the target wire as 0.
 
                     printInputValues(wire, name->next); //print out the name of wires to print out the first row of the truth table.
@@ -656,7 +656,6 @@ int main(int argc, char *argv[]) {
     }
     printf("out \n"); //print out the name of the "out" wire.
 
-    //TODO If there is stabilisation, but no wire is called out, then 0 is output.
     if (*(inNames->isLast) == 1) { //check if there is any output wire of the IN gate.
         printTheResult(gate, wire, totalNum);
     } else { //Otherwise (if there is more than one name of the output wire of the IN gate).
