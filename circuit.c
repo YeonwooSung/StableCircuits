@@ -545,7 +545,11 @@ void processAllPossibleCircuits(Gate gate, Wire wire, Name name, int totalNum) {
             startingPoint = 0;
         } else {
             if (totalNumOfNodes == totalNumOfOnes) {
-                changeAllWireValuesToOne(wire->next->next); //change all wire values to one.
+                if (checkIfOutWireIsUsed(gate) == 1) { //check if the "out" wire is used in the circuit.
+                    changeAllWireValuesToOne(wire->next->next);
+                } else {//if the circuit didn't use the "out" wire..
+                    changeAllWireValuesToOne(wire->next->next->next);
+                }
 
                 printInputValues(wire, name->next); //print out the name of wires to print out the first row of the truth table.
                 printTheResult(gate, wire, totalNum); //process the circuit and print out the rest rows of the truth table.
@@ -554,11 +558,7 @@ void processAllPossibleCircuits(Gate gate, Wire wire, Name name, int totalNum) {
             } else if ((totalNumOfNodes - 1) == totalNumOfOnes) {
                 startingPoint = totalNumOfNodes - 1;
                 for (int j = (totalNumOfNodes - 1); j >= 0; j--) {
-                    if (checkIfOutWireIsUsed(gate) == 1) {
-                        changeAllWireValuesToOne(wire->next->next->next->next); //check if the "out" wire is used in the circuit.
-                    } else {
-                        changeAllWireValuesToOne(wire->next->next->next);
-                    }
+                    changeAllWireValuesToOne(wire->next->next->next);
                     *(targetWires[startingPoint]->val) = 0; //change the value of the target wire as 0.
 
                     printInputValues(wire, name->next); //print out the name of wires to print out the first row of the truth table.
