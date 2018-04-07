@@ -297,7 +297,7 @@ void getInputWire(Wire wire, const char *index, char *val) { //Get the wires, ta
 }
 
 //Change the value of the output wire.
-void changeTheOutputWire(Wire wire, char *index, char *val) {
+void changeTheOutputWire(Wire wire, const char *index, const char *val) {
 
     char countWires = 0;
 
@@ -510,7 +510,7 @@ void processAllPossibleCircuits(Gate gate, Wire wire, Name name, long long int t
     long long startingPoint = 0; //to check the index of the target wire.
 
     //As we could run the circuit with 0 and 1 for the initial value of the wire, iterate the loop 2^(total number of nodes) times.
-    long long numToIterate = pow(2, (double)totalNumOfNodes);
+    long long numToIterate = (long long) pow(2, (double)totalNumOfNodes);
 
     Wire targetWires[totalNumOfNodes]; //A Wire type array to store all wires in it.
     for (long long i = 0; i < totalNumOfNodes; i++) {
@@ -671,7 +671,7 @@ int main(int argc, char *argv[]) {
      * If there are 2^(number of wires) different states then the very last state might be the one it stablisise for.
      * Thus, I set the bound of the circuit loop as "2^(number of wires) + 1".
      */
-    totalNum = pow(2, (double)totalNum) + 1;
+    totalNum = (long long) pow(2, (double)totalNum) + 1;
 
     if (*(inNames->isLast) == 0) {
         printNames(inNames->next); //print out the names of the output wires of the IN gates.
