@@ -29,7 +29,8 @@ void freeWires(Wire wire) {
     if (*(wire->isLast) == 0) { //Check if the current wire is the last wire
         freeWires(wire->next); //Call itself recursively.
     }
-
+    free(wire->val);
+    free(wire->isLast);
     free(wire);
 }
 
@@ -62,13 +63,14 @@ void freeGates(Gate root) {
 
     if (*(root->isLast) == 0) { //check if the gate is last gate.
         freeGates(root->next); //Free the next gates recursively.
-        free(root->in1);
-        free(root->in2);
-        free(root->out);
-        free(root->gateNum);
-        free(root->isLast);
-        free(root);
     }
+    //free the allocated memory
+    free(root->gateNum);
+    free(root->in1);
+    free(root->in2);
+    free(root->out);
+    free(root->isLast);
+    free(root);
 }
 
 //Make the new node and store it in the linked list.
@@ -457,7 +459,7 @@ char iterateProcess(Gate gate, Wire wire, long long totalNum) {
     //check if the previous turn's "out" wire's value is equal to the current value of the "out" wire.
     stabilised = isStabilised(wire->next->next, values);
 
-    free(values); //free the allocated memory.
+    freeNode(values); //free the allocated memory.
 
     return stabilised; //return 1 if the circuit is stabilised.
 }
