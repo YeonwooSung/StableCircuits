@@ -505,7 +505,8 @@ void printTheResult(Gate gate, Wire wire, long long totalNum) {
     }
 }
 
-//TODO finish this function.
+//This function will be called if the circuit contains the IN gate.
+//This will process the circuit with all possible inputs, and generate the suitable truth table as an output.
 void processAllPossibleCircuits(Gate gate, Wire wire, Name name, long long int totalNum) {
     char totalNumOfNodes = countNumOfName(name->next); //count the number of nodes.
     char totalNumOfOnes = 0; //the aim of this variable is to check the total number of 1s for the truth table.
