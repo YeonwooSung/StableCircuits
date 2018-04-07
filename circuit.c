@@ -533,7 +533,7 @@ void processAllPossibleCircuits(Gate gate, Wire wire, Name name, long long int t
             printTheResult(gate, wire, totalNum); //print the result of the circuit.
             changeAllWireValuesToZero(wire->next->next); //change all wire values to zero.
 
-        } else if (totalNumOfOnes == 1) {
+        } else if (totalNumOfOnes == 1) { //check if the total number of 1 is 1.
             while (startingPoint < totalNumOfNodes) {
                 *(targetWires[startingPoint]->val) = 1; //change the value of the first target wire as 1.
 
@@ -571,36 +571,9 @@ void processAllPossibleCircuits(Gate gate, Wire wire, Name name, long long int t
                 }
                 changeAllWireValuesToZero(wire->next->next); //reset all wires' value to 0.
                 startingPoint = 0; //reset the value of the startingPoint to 0.
+            } else {
+                //TODO
             }
-
-            char endPoint = totalNumOfOnes - 1; //This will depict the index of the last 1.
-            char numOfMoved = 0; //To check the number of moved 1s.
-            char numOfRemain = totalNumOfOnes - 2; //to check if the program moved all 1s.
-
-            for (int j = 0; j < totalNumOfOnes; j++) { //iterate the loop for "totalNumOfOnes" times to print out all possible outputs.
-
-                if (j == 0) {
-
-                    int n = 0; //to check the number of iteration.
-                    while (n < (totalNumOfNodes - 1)) {
-                        *(targetWires[n]->val) = 1;
-                        n += 1;
-                    }//while loop ends
-
-                } else if (j == totalNumOfOnes - 1) {
-
-                    int ind = totalNumOfOnes - 1; //the index of the target wire, to check the number of iteration.
-                    while (ind > 0) {
-                        *(targetWires[ind]->val) = 1;
-                        ind -= 1;
-                    }//while loop ends
-                } else {
-                    //TODO
-                }
-
-                changeAllWireValuesToZero(wire->next->next); //reset all wire values to 0.
-                numOfMoved += 1;
-            } //for loop ends.
 
         } //else statement ends
         totalNumOfOnes += 1; //Increase the value of the totalNumOfOnes.
