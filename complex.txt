@@ -1,0 +1,17 @@
+s IN
+r IN
+k IN
+t IN
+q IN
+o IN
+z IN
+x IN
+qbar NAND s r
+wbar NAND k t
+obar NAND q o
+ibar NAND z x
+xqbar NAND qbar wbar
+yqbar NAND obar ibar
+wqbar NAND xqbar yqbar
+out NAND kqbar wqbar
+kqbar NAND out wqbar

@@ -31,6 +31,7 @@ void freeWires(Wire wire) {
     }
     free(wire->val);
     free(wire->isLast);
+    free(wire->name);
     free(wire);
 }
 
@@ -77,22 +78,25 @@ void freeGates(Gate root) {
 struct node * makeNode(struct node *prev) {
     struct node *newNode = (struct node *) malloc(sizeof(struct node)); //allocate memory to the node.
 
-    newNode->val = (char *) malloc(1);
+    newNode->val = (char *) malloc(5);
     newNode->isLast = (char *) malloc(1);
 
     prev->next = newNode; //linke the previous node and new node.
     *(prev->isLast) = 0;
     *(newNode->isLast) = 1;
+    *(newNode->val) = -1;
 
     return newNode; //return the new node.
 }
 
 //Free the allocated memory.
 void freeNode(struct node *n) {
-    if (n != NULL) { //check if the current node is NULL.
+    if (*(n->isLast) == 0) { //check if the current node is NULL.
         freeNode(n->next); //Call itself recursively.
-        free(n); //Free the allocated memory.
     }
+    free(n->isLast);
+    free(n->val);
+    free(n); //Free the allocated memory.
 }
 
 void trim(char *input) {
@@ -121,6 +125,10 @@ void trim(char *input) {
 
 //Check if the wire name is constructed with number and lower case letter(s).
 char validateWireName(char *name) {
+    if (*name == '\0') {
+        return -1;
+    }
+
     char checker = 0;
 
     char str[20];
@@ -259,9 +267,13 @@ Name iterateTokenUntilNull(char *str, Gate gate, Wire wire, Name name) {
     }
 
     if (inGateFlag == 1) {
-        //*(name->isLast) = 0;
         name = makeNode(name);
-        strcpy(name->val, inGateResult);
+        if (sizeof(inGateFlag) == 1) {
+            *name->val = *inGateResult;
+            *(name->val + 1) = '\0'; //add the terminator
+        } else {
+            strcpy(name->val, inGateResult);
+        }
     }
 
     free(inGateResult);
@@ -277,7 +289,7 @@ Wire generateInitialWire() {
     wire->val = (char *) malloc(1);
     wire->isLast = (char *) malloc(1);
 
-    wire->name = "zero";
+    strcpy(wire->name, "zero"); //set the wire name as zero.
     *(wire->val) = 0;
     *(wire->isLast) = 1;
 
@@ -505,11 +517,11 @@ void printTheResult(Gate gate, Wire wire, long long totalNum) {
     }
 }
 
-void genearteBinary(long long num, long long targetNum, char numOfIngates, char *str) {
+//Generate the binary string to print out the n rows of the truth table
+void genearteBinary(long long num, long long targetNum, char *str) {
 
-    *(str + numOfIngates) = '\0';
-    int countNum = 1;
-    while (targetNum >>= 1) {
+    while (targetNum >>= 1) { //iterate the while loop with the shift operator.
+        //use the bit wise operators to generate the binary string.
         *str++ = (char) !!(targetNum & num);
     }
 }
@@ -518,7 +530,6 @@ void genearteBinary(long long num, long long targetNum, char numOfIngates, char 
 //This will process the circuit with all possible inputs, and generate the suitable truth table as an output.
 void processAllPossibleCircuits(Gate gate, Wire wire, Name name, long long int totalNum) {
     char totalNumOfNodes = countNumOfName(name->next); //count the number of nodes.
-    char totalNumOfOnes = 0; //the aim of this variable is to check the total number of 1s for the truth table.
 
     long long targetNum = (long long) pow (2, (double) totalNumOfNodes);
 
@@ -526,6 +537,8 @@ void processAllPossibleCircuits(Gate gate, Wire wire, Name name, long long int t
     long long numToIterate = (long long) pow(2, (double)totalNumOfNodes);
 
     Wire targetWires[totalNumOfNodes]; //A Wire type array to store all wires in it.
+
+    //Iterate the for loop to initialize the wire array.
     for (long long i = 0; i < totalNumOfNodes; i++) {
         Name targetName = name->next;
         int index = totalNumOfNodes - 1;
@@ -533,12 +546,13 @@ void processAllPossibleCircuits(Gate gate, Wire wire, Name name, long long int t
 
         for (int j = 0; j < index; j++) targetName = targetName->next;
 
-        targetWires[i] = getTheWireByName(wire, targetName->val);
+        targetWires[i] = getTheWireByName(wire, targetName->val); //initialize all elements of the Wire array.
     }
 
+    //Iterate the for loop n times, where the n is the total number of IN gates.
     for (long long i = 0; i < numToIterate; i++) {
-        char *str = (char *) malloc((int)totalNumOfNodes + 1);
-        genearteBinary(i, targetNum, totalNumOfNodes + 1, str);
+        char *str = (char *) malloc((int)totalNumOfNodes + 1); //
+        genearteBinary(i, targetNum, str);
         int count = 0;
 
         char currentIndex = totalNumOfNodes - 1;
@@ -556,6 +570,30 @@ void processAllPossibleCircuits(Gate gate, Wire wire, Name name, long long int t
 
         free(str);
     } //for loop ends.
+}
+
+//Read the input string by using the getline with while loop.
+void readInput(Gate gate, Wire wire, Name inNames, FILE *stream) {
+    char *buffer = NULL;
+    size_t len = 0;
+
+    int initChecker = 1;
+
+    //Loop the while loop until the there is no given input line.
+    while (getline(&buffer, &len, stream) != -1) { //Use the getline function to get the input string and store it in the variable "buffer".
+
+        if (initChecker == 1) { //if the value of counter is 1, run the codes in the if statement.
+            initChecker -= 1; //modify the value of the initChecker to 0.
+        } else { //if the value of the counter is not 1
+
+            gate = makeNextGate(findLastGate(gate));
+
+        }
+
+        inNames = iterateTokenUntilNull(buffer, gate, wire, inNames); //Tokenize the input string, and make the wire and gates.
+    }
+
+    free(buffer); //free the allocated memory.
 }
 
 //The main function, which is the starting point of the circuit program.
@@ -590,35 +628,13 @@ int main(int argc, char *argv[]) {
 
     //Allocate the memory to make the linked list that stores the name of the output wire of the IN gate.
     Name inNames = (Name) malloc(sizeof(struct node));
+    inNames->val = (char *) malloc(5);
+    strcpy(inNames->val, "init");
     inNames->isLast = (char *) malloc(1);
     *(inNames->isLast) = 1;
     inNames->next = NULL; //set the next node as NULL.
 
-    //Allocate memory to get the input string.
-    char *buffer = NULL;
-    size_t len = 0;
-
-    int initChecker = 1;
-
-    long mAddressOfGate = (long) gate; //store the memory address of the first gate.
-    long mAddressOfName = (long) inNames; //store the memory address of the first node of the name list.
-
-    //Loop the while loop until the there is no given input line.
-    while (getline(&buffer, &len, stream) != -1) { //Use the getline function to get the input string and store it in the variable "buffer".
-
-        if (initChecker == 1) { //if the value of counter is 1, run the codes in the if statement.
-            initChecker -= 1; //modify the value of the initChecker to 0.
-        } else { //if the value of the counter is not 1
-            gate = makeNextGate(findLastGate(gate));
-        }
-
-        inNames = iterateTokenUntilNull(buffer, gate, wire, inNames); //Tokenize the input string, and make the wire and gates.
-    }
-
-    gate = (Gate) mAddressOfGate; //Reset the memory address of the first gate.
-    inNames = (Name) mAddressOfName; //Reset the memory address of the first node.
-
-    free(buffer); //free the allocated memory.
+    readInput(gate, wire, inNames, stream); //read the user input to make gates and wires for the circuit.
 
     long long totalNum = countNumOfWire(wire);
     /*
@@ -642,6 +658,10 @@ int main(int argc, char *argv[]) {
     freeNode(inNames);
     freeGates(gate);
     freeWires(wire);
+
+    if (argc >= 2) {
+        fclose(stream); //close the opened file.
+    }
 
     return 0;
 }
