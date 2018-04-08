@@ -505,12 +505,22 @@ void printTheResult(Gate gate, Wire wire, long long totalNum) {
     }
 }
 
+void genearteBinary(long long num, long long targetNum, char numOfIngates, char *str) {
+
+    *(str + numOfIngates) = '\0';
+    int countNum = 1;
+    while (targetNum >>= 1) {
+        *str++ = (char) !!(targetNum & num);
+    }
+}
+
 //This function will be called if the circuit contains the IN gate.
 //This will process the circuit with all possible inputs, and generate the suitable truth table as an output.
 void processAllPossibleCircuits(Gate gate, Wire wire, Name name, long long int totalNum) {
     char totalNumOfNodes = countNumOfName(name->next); //count the number of nodes.
     char totalNumOfOnes = 0; //the aim of this variable is to check the total number of 1s for the truth table.
-    long long startingPoint = 0; //to check the index of the target wire.
+
+    long long targetNum = (long long) pow (2, (double) totalNumOfNodes);
 
     //As we could run the circuit with 0 and 1 for the initial value of the wire, iterate the loop 2^(total number of nodes) times.
     long long numToIterate = (long long) pow(2, (double)totalNumOfNodes);
@@ -527,56 +537,24 @@ void processAllPossibleCircuits(Gate gate, Wire wire, Name name, long long int t
     }
 
     for (long long i = 0; i < numToIterate; i++) {
-        if (totalNumOfOnes == 0) { //check if the total number of 1 is 0.
+        char *str = (char *) malloc((int)totalNumOfNodes + 1);
+        genearteBinary(i, targetNum, totalNumOfNodes + 1, str);
+        int count = 0;
 
-            printInputValues(wire, name->next);
-            printTheResult(gate, wire, totalNum); //print the result of the circuit.
-            changeAllWireValuesToZero(wire->next->next); //change all wire values to zero.
+        char currentIndex = totalNumOfNodes - 1;
+        char indexOfWire = 0;
 
-        } else if (totalNumOfOnes == 1) { //check if the total number of 1 is 1.
-            while (startingPoint < totalNumOfNodes) {
-                *(targetWires[startingPoint]->val) = 1; //change the value of the first target wire as 1.
+        while (count++ < totalNumOfNodes) {
+            *(targetWires[(int)indexOfWire]->val) = *(str + currentIndex);
+            currentIndex -= 1;
+            indexOfWire += 1;
+        }
 
-                printInputValues(wire, name->next);
-                printTheResult(gate, wire, totalNum);
+        printInputValues(wire, name->next);
+        printTheResult(gate, wire, totalNum); //print the result of the circuit.
+        changeAllWireValuesToZero(wire->next->next); //change all wire values to zero.
 
-                *(targetWires[startingPoint]->val) = 0;
-
-                startingPoint += 1;
-            }
-            startingPoint = 0;
-        } else {
-            if (totalNumOfNodes == totalNumOfOnes) {
-                if (checkIfOutWireIsUsed(gate) == 1) { //check if the "out" wire is used in the circuit.
-                    changeAllWireValuesToOne(wire->next->next);
-                } else {//if the circuit didn't use the "out" wire..
-                    changeAllWireValuesToOne(wire->next->next->next);
-                }
-
-                printInputValues(wire, name->next); //print out the name of wires to print out the first row of the truth table.
-                printTheResult(gate, wire, totalNum); //process the circuit and print out the rest rows of the truth table.
-
-                return; //terminate the function.
-            } else if ((totalNumOfNodes - 1) == totalNumOfOnes) {
-                startingPoint = totalNumOfNodes - 1;
-                for (int j = (totalNumOfNodes - 1); j >= 0; j--) {
-                    changeAllWireValuesToOne(wire->next->next->next);
-                    *(targetWires[startingPoint]->val) = 0; //change the value of the target wire as 0.
-
-                    printInputValues(wire, name->next); //print out the name of wires to print out the first row of the truth table.
-                    printTheResult(gate, wire, totalNum); //process the circuit and print out the rest rows of the truth table.
-
-                    *(targetWires[startingPoint]->val) = 1; //return the value of the target wire as 1.
-                    startingPoint -= 1;
-                }
-                changeAllWireValuesToZero(wire->next->next); //reset all wires' value to 0.
-                startingPoint = 0; //reset the value of the startingPoint to 0.
-            } else {
-                //TODO
-            }
-
-        } //else statement ends
-        totalNumOfOnes += 1; //Increase the value of the totalNumOfOnes.
+        free(str);
     } //for loop ends.
 }
 
