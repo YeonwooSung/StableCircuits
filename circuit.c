@@ -268,7 +268,7 @@ Name iterateTokenUntilNull(char *str, Gate gate, Wire wire, Name name) {
 
     if (inGateFlag == 1) {
         name = makeNode(name);
-        if (strlen(inGateResult) == 1) {
+        if (sizeof(inGateFlag) == 1) {
             *name->val = *inGateResult;
             *(name->val + 1) = '\0'; //add the terminator
         } else {
@@ -424,6 +424,25 @@ void storeValues(Values values, Wire wires) {
     *(values->val) = *(wires->val);
 }
 
+//Check if the "out" wire is used in the circuit.
+char checkIfOutWireIsUsed(Gate gate) {
+
+    while (*(gate->isLast) == 0) {
+
+        if (*(gate->out) == 2 || *(gate->in1) == 2 || *(gate->in2) == 2) {
+            return 1;
+        }
+
+        gate = gate->next;
+    }
+
+    if (*(gate->out) == 2 || *(gate->in1) == 2 || *(gate->in2) == 2) {
+        return 1;
+    }
+
+    return 0;
+}
+
 //Iterate the while loop to process the circuit to check if the circuit stabilised.
 char iterateProcess(Gate gate, Wire wire, long long totalNum) {
 
@@ -466,6 +485,15 @@ void changeAllWireValuesToZero(Wire wire) {
     *(wire->val) = 0;
 }
 
+//This function change all wire values to one.
+void changeAllWireValuesToOne(Wire wire) {
+    while (*(wire->isLast) == 0) { //check if the current node is the last node.
+        *(wire->val) = 1;
+        wire = wire->next;
+    }
+    *(wire->val) = 1;
+}
+
 //Print the value of the all output wires of the IN gates.
 void printInputValues(Wire wire, Name name) {
 
@@ -494,7 +522,7 @@ void genearteBinary(long long num, long long targetNum, char *str) {
 
     while (targetNum >>= 1) { //iterate the while loop with the shift operator.
         //use the bit wise operators to generate the binary string.
-        *str++ = (char) ((targetNum & num) != 0);
+        *str++ = (char) !!(targetNum & num);
     }
 }
 
@@ -502,6 +530,19 @@ void genearteBinary(long long num, long long targetNum, char *str) {
 //This will process the circuit with all possible inputs, and generate the suitable truth table as an output.
 void processAllPossibleCircuits(Gate gate, Wire wire, Name name, long long int totalNum) {
     char totalNumOfNodes = countNumOfName(name->next); //count the number of nodes.
+
+    if (totalNumOfNodes == 0) {
+        printInputValues(wire, name->next);
+        printTheResult(gate, wire, totalNum); //print the result of the circuit.
+        changeAllWireValuesToZero(wire->next->next); //change all wire values to zero.
+
+        Wire target = getTheWireByName(wire, name->next->val);
+        *(target->val) = 1;
+
+        printInputValues(wire, name->next);
+        printTheResult(gate, wire, totalNum); //print the result of the circuit.
+        return;
+    }
 
     long long targetNum = (long long) pow (2, (double) totalNumOfNodes);
 
@@ -523,11 +564,11 @@ void processAllPossibleCircuits(Gate gate, Wire wire, Name name, long long int t
 
     //Iterate the for loop n times, where the n is the total number of IN gates.
     for (long long i = 0; i < numToIterate; i++) {
-        char *str = (char *) malloc((unsigned int)totalNumOfNodes + 1); //
+        char *str = (char *) malloc((int)totalNumOfNodes + 1); //
         genearteBinary(i, targetNum, str);
         int count = 0;
 
-        char currentIndex = (char) (totalNumOfNodes - 1);
+        char currentIndex = totalNumOfNodes - 1;
         char indexOfWire = 0;
 
         while (count++ < totalNumOfNodes) {
@@ -577,6 +618,11 @@ int main(int argc, char *argv[]) {
         stream = stdin; //if there is no command line argument, use the standard input stream.
     } else {
         stream = fopen(argv[1], "r"); //Open the file stream to read the file.
+
+        if (stream == NULL) {
+            printf("File not found: %s\n", argv[1]);
+            return 0;
+        }
     }
 
     //Make the root gate.
